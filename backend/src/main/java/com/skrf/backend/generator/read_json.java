@@ -7,6 +7,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -25,7 +27,9 @@ import com.skrf.backend.model.User;
 //We have independent tables: Users, Objtype - these tables can be filled automatically
 //dependent tables: Object (Event, Participants,Terms) and Eventtype (Eventrules, Users) - additional logic is required 
 public class read_json {
-
+	
+	private static Logger logger = LoggerFactory.getLogger(read_json.class);
+	
 	private String file_name;
 	private byte[] file_data;
 	private JsonFactory JSONfactory;
@@ -52,12 +56,9 @@ public class read_json {
 		
 		try {
 			jsonUsers = this.JSONMapper.readValue(file_data, User[].class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (JsonParseException | JsonMappingException e) {
+			logger.error("JSON Parser error: {} ", e.getOriginalMessage() );
+			return null;
 		}
 		
 		return Arrays.asList(jsonUsers);
@@ -72,12 +73,10 @@ public class read_json {
 		
 		try {
 			Objtypes = this.JSONMapper.readValue(file_data, Objtype[].class);
-		} catch (JsonParseException e) {
+		} catch (JsonParseException | JsonMappingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("JSON Parser error: {} ", e.getOriginalMessage() );
+			return null;
 		}
 		return Arrays.asList(Objtypes);
 	}
@@ -92,12 +91,10 @@ public class read_json {
 		
 		try {
 			Eventtypes = this.JSONMapper.readValue(file_data, Eventtype[].class);
-		} catch (JsonParseException e) {
+		} catch (JsonParseException | JsonMappingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("JSON Parser error: {} ", e.getOriginalMessage() );
+			return null;
 		}
 		List<Eventtype> LEventtypes = Arrays.asList(Eventtypes);
 		EventrulePK er_id = null;
@@ -132,12 +129,10 @@ public class read_json {
 		
 		try {
 			lv_objects = this.JSONMapper.readValue(file_data, Objects[].class);
-		} catch (JsonParseException e) {
+		} catch (JsonParseException | JsonMappingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("JSON Parser error: {} ", e.getOriginalMessage() );
+			return null;
 		}
 		
 		List<Objects> ObjectsList = Arrays.asList(lv_objects);

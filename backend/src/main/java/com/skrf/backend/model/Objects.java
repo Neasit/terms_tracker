@@ -61,15 +61,15 @@ public class Objects implements Serializable {
 	private String reason;
 
 	//bi-directional many-to-one association to Event
-	@OneToMany(mappedBy="ref_obj", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="ref_obj", cascade=CascadeType.ALL)
 	private List<Event> events;
 
 	//bi-directional many-to-one association to Participant
-	@OneToMany(mappedBy="ref_objid", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="ref_objid", cascade=CascadeType.ALL)
 	private List<Participant> participants;
 
 	//bi-directional many-to-one association to Term
-	@OneToMany(mappedBy="ref_objid", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="ref_objid", cascade=CascadeType.ALL)
 	private List<Term> terms;
 
 	public Objects() {

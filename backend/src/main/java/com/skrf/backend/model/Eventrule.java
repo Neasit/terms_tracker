@@ -34,13 +34,13 @@ public class Eventrule implements Serializable {
 	@Transient
 	private Integer act_user;		//Only for JSON Model
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="act_user")
 	@JsonIgnore
 	private User ref_user;
 
 	//bi-directional many-to-one association to Eventtype
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="eventtype", insertable=false, updatable=false)
 	@JsonIgnore
 	private Eventtype eventtypeBean;

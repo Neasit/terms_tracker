@@ -32,7 +32,7 @@ public class Eventtype implements Serializable {
 	private List<Event> events;
 
 	//bi-directional many-to-one association to Eventrule
-	@OneToMany(mappedBy="eventtypeBean", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="eventtypeBean", cascade=CascadeType.ALL)
 	private List<Eventrule> eventrules;
 
 	public Eventtype() {

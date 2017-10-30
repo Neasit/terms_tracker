@@ -2,6 +2,7 @@ package com.skrf.backend;
 
 import com.skrf.backend.generator.read_json;
 import com.skrf.backend.model.*;
+import com.skrf.backend.odatamodel.events_settings;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,10 @@ public class App
     	try {
     		
     		read_json CTest = new read_json();
+    		
+    		events_settings test_st = new events_settings();
+    		test_st.readEntitySetData(null);
+    		
     		
     		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("com.skrf.backend");
     		EntityManager em = entityManagerFactory.createEntityManager();

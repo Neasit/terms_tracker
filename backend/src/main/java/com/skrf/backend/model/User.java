@@ -38,7 +38,7 @@ public class User implements Serializable {
 	private List<Eventrule> eventrules;
 
 	//bi-directional many-to-one association to Object
-	@OneToMany(mappedBy="ref_user", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy="ref_user")
 	@JsonIgnore
 	private List<Objects> objects;
 
