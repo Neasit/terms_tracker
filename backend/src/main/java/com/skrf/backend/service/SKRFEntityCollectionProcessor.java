@@ -25,11 +25,17 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 
+import com.skrf.backend.odatamodel.entity_manipulator;
 import com.skrf.backend.odatamodel.events_settings;
 
 public class SKRFEntityCollectionProcessor implements EntityCollectionProcessor {
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
+	private entity_manipulator storage;
+	
+	public SKRFEntityCollectionProcessor(entity_manipulator storage) {
+		this.storage = storage;
+	}
 	
 	@Override
 	public void init(OData arg0, ServiceMetadata arg1) {
