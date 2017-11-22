@@ -77,8 +77,6 @@ public class SKRFEntityCollectionProcessor implements EntityCollectionProcessor 
 			e.printStackTrace(); 
 		}
 
-
-
 	}
 
 }
