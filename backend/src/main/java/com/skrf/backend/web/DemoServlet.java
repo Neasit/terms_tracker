@@ -16,6 +16,7 @@ import org.apache.olingo.server.api.edmx.EdmxReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.skrf.backend.odatamodel.DataManipulatorFactory;
 import com.skrf.backend.odatamodel.events_settings;
 import com.skrf.backend.service.SKRFEdmProvider;
 import com.skrf.backend.service.SKRFEntityCollectionProcessor;
@@ -32,10 +33,10 @@ public class DemoServlet extends HttpServlet {
 		try {
 			
 			HttpSession session = req.getSession(true);
-			events_settings storage = (events_settings) session.getAttribute(events_settings.class.getName());
-			if (storage == null) {
-				storage = new events_settings();
-				session.setAttribute(events_settings.class.getName(), storage);
+			DataManipulatorFactory dataManipulatorF = (DataManipulatorFactory) session.getAttribute(DataManipulatorFactory.class.getName());
+			if (dataManipulatorF == null) {
+				dataManipulatorF = new DataManipulatorFactory();
+				session.setAttribute(DataManipulatorFactory.class.getName(), dataManipulatorF);
 			} 
 			
 			// create odata handler and configure it with CsdlEdmProvider and Processor
@@ -44,9 +45,9 @@ public class DemoServlet extends HttpServlet {
 			// ArrayList<EdmxReference>());
 			ServiceMetadata edm = odata.createServiceMetadata(new SKRFEdmProvider(), new ArrayList<EdmxReference>());
 			ODataHttpHandler handler = odata.createHandler(edm);
-			handler.register(new SKRFEntityCollectionProcessor(storage));
-			handler.register(new SKRFEntityProcessor(storage));
-			handler.register(new SKRFPrimitiveProcessor(storage));
+			handler.register(new SKRFEntityCollectionProcessor(dataManipulatorF));
+			handler.register(new SKRFEntityProcessor(dataManipulatorF));
+			handler.register(new SKRFPrimitiveProcessor(dataManipulatorF));
 
 			// let the handler do the work
 			handler.process(req, resp);

@@ -29,17 +29,19 @@ import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
 
+import com.skrf.backend.odatamodel.DataManipulator;
+import com.skrf.backend.odatamodel.DataManipulatorFactory;
 import com.skrf.backend.odatamodel.entity_manipulator;
 
 public class SKRFPrimitiveProcessor implements PrimitiveProcessor {
     private OData odata;
-    private entity_manipulator storage;
     private ServiceMetadata serviceMetadata;
-    
-    public SKRFPrimitiveProcessor(entity_manipulator storage) {
-        this.storage = storage;
-    }
-    
+	private DataManipulatorFactory dataManipulatorF;
+	
+	public SKRFPrimitiveProcessor(DataManipulatorFactory factory) {
+		this.dataManipulatorF = factory;
+	}
+	
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		// TODO Auto-generated method stub
@@ -69,7 +71,8 @@ public class SKRFPrimitiveProcessor implements PrimitiveProcessor {
 
         // 2. retrieve data from backend
         // 2.1. retrieve the entity data, for which the property has to be read
-        Entity entity = storage.readEntityData(edmEntitySet, keyPredicates);
+        DataManipulator storage = this.dataManipulatorF.getDataManipulator(edmEntitySet);
+        Entity entity = storage.readEntityData(keyPredicates);
         if (entity == null) { // Bad request
             throw new ODataApplicationException("Entity not found",
                         HttpStatusCode.NOT_FOUND.getStatusCode(), Locale.ENGLISH);

@@ -25,17 +25,19 @@ import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 
+import com.skrf.backend.odatamodel.DataManipulator;
+import com.skrf.backend.odatamodel.DataManipulatorFactory;
 import com.skrf.backend.odatamodel.entity_manipulator;
 
 public class SKRFEntityProcessor implements EntityProcessor {
 	
     private OData odata;
     private ServiceMetadata serviceMetadata;
-    private entity_manipulator storage;
-    
-    public SKRFEntityProcessor(entity_manipulator storage) {
-    	this.storage = storage;
-    }
+	private DataManipulatorFactory dataManipulatorF;
+	
+	public SKRFEntityProcessor(DataManipulatorFactory factory) {
+		this.dataManipulatorF = factory;
+	}
     
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
@@ -55,8 +57,9 @@ public class SKRFEntityProcessor implements EntityProcessor {
 	    EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
 	    // 2. retrieve the data from backend
+	    DataManipulator storage = this.dataManipulatorF.getDataManipulator(edmEntitySet);
 	    List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
-	    Entity entity = storage.readEntityData(edmEntitySet, keyPredicates);
+	    Entity entity = storage.readEntityData(keyPredicates);
 
 	    // 3. serialize
 	    EdmEntityType entityType = edmEntitySet.getEntityType();

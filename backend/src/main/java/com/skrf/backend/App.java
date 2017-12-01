@@ -22,8 +22,8 @@ public class App
     		
     		read_json CTest = new read_json();
     		
-    		events_settings test_st = new events_settings();
-    		test_st.readEntitySetData(null);
+    		//events_settings test_st = new events_settings();
+    		//test_st.readEntitySetData(null);
     		
     		
     		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("com.skrf.backend");

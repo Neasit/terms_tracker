@@ -12,7 +12,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name="eventrules")
-@NamedQuery(name="Eventrule.findAll", query="SELECT e FROM Eventrule e")
+@NamedQueries({
+@NamedQuery(name="Eventrule.findAll", query="SELECT e FROM Eventrule e"),
+@NamedQuery(name="Eventrule.findByType", query="SELECT e FROM Eventrule e WHERE e.id.eventtype = :eventtype"),
+@NamedQuery(name="Eventrule.findByKey", 
+			query="SELECT e FROM Eventrule e WHERE e.id.eventtype = :eventtype AND e.id.rulesnmb = :rulenmb"),
+})
 public class Eventrule implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

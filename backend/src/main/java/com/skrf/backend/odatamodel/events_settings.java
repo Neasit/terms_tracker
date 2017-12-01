@@ -33,7 +33,7 @@ public class events_settings extends entity_manipulator {
 	public EntityCollection readEntitySetData(EdmEntitySet edmEntitySet) throws ODataApplicationException {
 
 		// actually, this is only required if we have more than one Entity Sets
-		if (edmEntitySet.getName().equals(SKRFEdmProvider.ES_EVENTSETTINGS_NAME)) {
+		if (edmEntitySet.getName().equals(SKRFEdmProvider.ES_EVENTTYPES_NAME)) {
 			return getAllEventTypes();
 		}
 
