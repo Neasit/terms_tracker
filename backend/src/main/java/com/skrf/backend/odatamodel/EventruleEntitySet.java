@@ -1,6 +1,9 @@
 package com.skrf.backend.odatamodel;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -11,11 +14,13 @@ import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
+import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriParameter;
 
 import com.skrf.backend.model.Eventrule;
 import com.skrf.backend.model.User;
+import com.skrf.backend.service.SKRFEdmProvider;
 
 public class EventruleEntitySet extends EntityReader {
 	private String key1Name = "eventtype";
@@ -63,17 +68,7 @@ public class EventruleEntitySet extends EntityReader {
 			em.close();
 		}
 		if (Eventrule_bd != null) {
-			EventruleEntity = new Entity();
-			EventruleEntity.addProperty(new Property(null, "eventtype", ValueType.PRIMITIVE, Eventrule_bd.getId().getEventtype()));
-			EventruleEntity.addProperty(new Property(null, "rulesnmb", ValueType.PRIMITIVE, Eventrule_bd.getId().getRulesnmb()));
-			EventruleEntity.addProperty(new Property(null, "action", ValueType.PRIMITIVE, Eventrule_bd.getAction()));
-			EventruleEntity.addProperty(new Property(null, "intvalue", ValueType.PRIMITIVE, Eventrule_bd.getIntvalue()));
-			User usr = Eventrule_bd.getRefUser();
-			Integer userId = null;
-			if (usr != null) {
-				userId = usr.getId();
-			}
-			EventruleEntity.addProperty(new Property(null, "user", ValueType.PRIMITIVE, userId));
+			EventruleEntity = this.convertToEntity(Eventrule_bd);
 		}
 		return EventruleEntity;
 	}
@@ -81,10 +76,8 @@ public class EventruleEntitySet extends EntityReader {
 	@SuppressWarnings("unchecked")
 	private EntityCollection getAllEventRules() {
 		EntityCollection retEntitySet = new EntityCollection();
-		List<Eventrule> Eventrules_bd = null;
+		List<Eventrule> Eventrules_bd = new ArrayList<Eventrule>();
 		EntityManager em = createEntityManager();
-		User usr = null;
-		Integer userId;
 		
 		try {
 			Eventrules_bd = em.createNamedQuery("Eventrule.findAll").getResultList();
@@ -95,23 +88,73 @@ public class EventruleEntitySet extends EntityReader {
 		}
 
 		for (Eventrule er : Eventrules_bd) {
-			userId = null;
-			usr = null;
-			Entity EventruleEntity = new Entity();
-			EventruleEntity.addProperty(new Property(null, "eventtype", ValueType.PRIMITIVE, er.getId().getEventtype()));
-			EventruleEntity.addProperty(new Property(null, "rulesnmb", ValueType.PRIMITIVE, er.getId().getRulesnmb()));
-			EventruleEntity.addProperty(new Property(null, "action", ValueType.PRIMITIVE, er.getAction()));
-			EventruleEntity.addProperty(new Property(null, "intvalue", ValueType.PRIMITIVE, er.getIntvalue()));
-			usr = er.getRefUser();
-			if (usr != null) {
-				userId = usr.getId();
-			}
-			EventruleEntity.addProperty(new Property(null, "user", ValueType.PRIMITIVE, userId));
-
-			retEntitySet.getEntities().add(EventruleEntity);
+			retEntitySet.getEntities().add(this.convertToEntity(er));
 		}
 
 		return retEntitySet;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private EntityCollection getByType(String keyType) {
+		EntityCollection retEntitySet = new EntityCollection();
+		List<Eventrule> Eventrules_bd = null;
+		EntityManager em = createEntityManager();
+		
+		try {
+			Query mq = em.createNamedQuery("Eventrule.findByType");
+			mq.setParameter("eventtype", keyType);
+			Eventrules_bd = mq.getResultList();
+		} catch (Exception e) {
+			logger.error("Error by selecting data: {}", e.getMessage());
+		} finally {
+			em.close();
+		}
+
+		for (Eventrule er : Eventrules_bd) {
+			retEntitySet.getEntities().add(this.convertToEntity(er));
+		}
+
+		return retEntitySet;
+	}
+
+	@SuppressWarnings("unlikely-arg-type")
+	@Override
+	public EntityCollection readRealatedFor(Entity filterEntity, List<UriParameter> keyPredicates)
+			throws ODataApplicationException {
+		// TODO Auto-generated method stub
+		EntityCollection retEC = new EntityCollection();
+		if(SKRFEdmProvider.ET_EVENTTYPE_FQN.getFullQualifiedNameAsString().equals(filterEntity.getType())) {
+			if(!keyPredicates.isEmpty()) {
+				retEC.getEntities().add(this.readEntityData(keyPredicates));
+			} else {
+				retEC = this.getByType((String)filterEntity.getProperty("eventtype").getValue());
+			}
+			return retEC;
+		} else {
+			logger.error("Not implemented link from: {}", filterEntity.getType());
+			throw new ODataApplicationException("Not implemented.", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+		}
+	}
+	
+	@Override
+	protected Entity convertToEntity(Object dataBD) {
+		User usr = null;
+		Integer userId = null;
+		
+		Eventrule erBD = (Eventrule) dataBD;
+		Entity EventruleEntity = new Entity();
+		EventruleEntity.addProperty(new Property(null, "eventtype", ValueType.PRIMITIVE, erBD.getId().getEventtype()));
+		EventruleEntity.addProperty(new Property(null, "rulesnmb", ValueType.PRIMITIVE, erBD.getId().getRulesnmb()));
+		EventruleEntity.addProperty(new Property(null, "action", ValueType.PRIMITIVE, erBD.getAction()));
+		EventruleEntity.addProperty(new Property(null, "intvalue", ValueType.PRIMITIVE, erBD.getIntvalue()));
+		usr = erBD.getRefUser();
+		if (usr != null) {
+			userId = usr.getId();
+		}
+		EventruleEntity.addProperty(new Property(null, "user", ValueType.PRIMITIVE, userId));
+		EventruleEntity.setType(this.EntityType.getFullQualifiedName().getFullQualifiedNameAsString());
+		
+		return EventruleEntity;
 	}
 
 }

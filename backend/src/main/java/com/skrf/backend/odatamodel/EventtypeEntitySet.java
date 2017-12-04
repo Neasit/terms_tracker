@@ -3,6 +3,7 @@ package com.skrf.backend.odatamodel;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -16,10 +17,12 @@ import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
 import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
+import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriParameter;
 
 import com.skrf.backend.model.Eventtype;
+import com.skrf.backend.service.SKRFEdmProvider;
 
 public class EventtypeEntitySet extends EntityReader {
 	
@@ -60,10 +63,7 @@ public class EventtypeEntitySet extends EntityReader {
 			em.close();
 		}
 		if (Eventtype_bd != null) {
-			EventtypeEntity = new Entity();
-			EventtypeEntity
-					.addProperty(new Property(null, "eventtype", ValueType.PRIMITIVE, Eventtype_bd.getEventtype()));
-			EventtypeEntity.addProperty(new Property(null, "descr", ValueType.PRIMITIVE, Eventtype_bd.getDescr()));
+			EventtypeEntity = this.convertToEntity(Eventtype_bd);
 		}
 		return EventtypeEntity;
 	}
@@ -83,15 +83,45 @@ public class EventtypeEntitySet extends EntityReader {
 		}
 
 		for (Eventtype et : Eventtypes_bd) {
-
-			Entity EventtypeEntity = new Entity();
-			EventtypeEntity.addProperty(new Property(null, "eventtype", ValueType.PRIMITIVE, et.getEventtype()));
-			EventtypeEntity.addProperty(new Property(null, "descr", ValueType.PRIMITIVE, et.getDescr()));
-
-			retEntitySet.getEntities().add(EventtypeEntity);
+			retEntitySet.getEntities().add(this.convertToEntity(et));
 		}
 
 		return retEntitySet;
+	}
+
+	@SuppressWarnings("unlikely-arg-type")
+	@Override
+	public EntityCollection readRealatedFor(Entity filterEntity, List<UriParameter> keyPredicates)
+			throws ODataApplicationException {
+		// TODO Auto-generated method stub
+		EntityCollection retEC = new EntityCollection();
+		if(SKRFEdmProvider.ET_EVENTRULE_FQN.getFullQualifiedNameAsString().equals(filterEntity.getType())) {
+			if(!keyPredicates.isEmpty()) {
+				retEC.getEntities().add(this.readEntityData(keyPredicates));
+			} else {
+				retEC.getEntities().add(this.getEventtypeByKey((String)filterEntity.getProperty("eventtype").getValue()));
+			}
+			return retEC;
+		} else {
+			logger.error("Not implemented link from: {}", filterEntity.getType());
+			throw new ODataApplicationException("Not implemented.", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+		}
+	}
+	
+	@Override
+	protected Entity convertToEntity(Object dataBD) {
+		Eventtype etBD = null;
+		try {
+			etBD = (Eventtype) dataBD;
+		} catch (Exception e) {
+			logger.error("Error by casting {}", e.getMessage());
+			return null;
+		}
+		Entity EventtypeEntity = new Entity();
+		EventtypeEntity.addProperty(new Property(null, "eventtype", ValueType.PRIMITIVE, etBD.getEventtype()));
+		EventtypeEntity.addProperty(new Property(null, "descr", ValueType.PRIMITIVE, etBD.getDescr()));
+		EventtypeEntity.setType(this.EntityType.getFullQualifiedName().getFullQualifiedNameAsString());
+		return EventtypeEntity;
 	}
 
 }

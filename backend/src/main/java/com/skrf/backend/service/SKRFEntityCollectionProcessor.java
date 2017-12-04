@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
+import org.apache.olingo.commons.api.data.ContextURL.Suffix;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -80,11 +81,9 @@ public class SKRFEntityCollectionProcessor implements EntityCollectionProcessor 
 			UriResource lastSegment = Utils.getLastNavigation(arg2);
 		    if(lastSegment instanceof UriResourceNavigation){
 		        UriResourceNavigation uriResourceNavigation = (UriResourceNavigation)lastSegment;
-		        EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
-		        
-		        EdmEntityType targetEntityType = edmNavigationProperty.getType();
+		        List<UriParameter> navKeyPredicates = uriResourceNavigation.getKeyPredicates();
 		        responseEdmEntitySet = Utils.getNavigationTargetEntitySet(arg2);
-
+		        
 		        // 2nd: fetch the data from backend
 		        // first fetch the entity where the first segment of the URI points to
 		        // e.g. Categories(3)/Products first find the single entity: Category(3)
@@ -98,15 +97,14 @@ public class SKRFEntityCollectionProcessor implements EntityCollectionProcessor 
 		        // then fetch the entity collection where the entity navigates to
 		        storage = this.dataManipulatorF.getDataManipulator(responseEdmEntitySet);
 		        
-		        responseEntityCollection = storage.readEntitySetData(); // ???? !!!! 
+		        responseEntityCollection = storage.readRealatedFor(sourceEntity, navKeyPredicates); 
 		    }
 		} else {
 			throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),Locale.ROOT);
 		}
 
-
 		// 3rd: create a serializer based on the requested format (json)
-	    ContextURL contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).build();
+	    ContextURL contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).build();;
 	    final String id = arg0.getRawBaseUri() + "/" + responseEdmEntitySet.getName();
 	    EntityCollectionSerializerOptions opts = EntityCollectionSerializerOptions.with().contextURL(contextUrl).id(id).build();
 	    EdmEntityType edmEntityType = responseEdmEntitySet.getEntityType();

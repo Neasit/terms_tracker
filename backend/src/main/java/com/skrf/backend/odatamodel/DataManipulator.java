@@ -11,5 +11,6 @@ public interface DataManipulator {
 
 	public EntityCollection readEntitySetData() throws ODataApplicationException;
 	public Entity readEntityData(List<UriParameter> keyPredicates) throws ODataApplicationException;
+	public EntityCollection readRealatedFor(Entity filterEntity, List<UriParameter> keyPredicates) throws ODataApplicationException;
 	
 }

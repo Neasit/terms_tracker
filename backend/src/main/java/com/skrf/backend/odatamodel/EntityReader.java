@@ -3,6 +3,7 @@ package com.skrf.backend.odatamodel;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.slf4j.Logger;
@@ -24,6 +25,10 @@ public abstract class EntityReader implements DataManipulator{
 	
 	protected EntityManager createEntityManager() {
 		return emf.createEntityManager();
+	}
+	
+	protected Entity convertToEntity(Object dataBD) {
+		return null;
 	}
 	
 }

@@ -34,7 +34,7 @@ public class SKRFEdmProvider extends CsdlAbstractEdmProvider {
 	public static final FullQualifiedName ET_EVENTTYPE_FQN = new FullQualifiedName(NAMESPACE, ET_EVENTTYPE_NAME);
 	public static final String ET_EVENTRULE_NAME = "Eventrule";
 	public static final FullQualifiedName ET_EVENTRULE_FQN = new FullQualifiedName(NAMESPACE, ET_EVENTRULE_NAME);
-
+	
 	// Entity Set Names
 	public static final String ES_EVENTTYPES_NAME = "Eventtypes";
 	public static final String ES_EVENTRULES_NAME = "Eventrules";
